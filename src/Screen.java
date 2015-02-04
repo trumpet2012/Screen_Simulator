@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * William Trent Holliday
@@ -9,19 +11,53 @@ import java.awt.*;
  *
  */
 public class Screen extends JPanel {
+    private int verticalLines = 80, horizontalLines = 60;
     public static void main(String[] args){
         new Screen();
     }
 
     public Screen(){
         JFrame contentFrame = new JFrame("Screen Simulator");
+        GroupLayout layout = new GroupLayout(contentFrame.getContentPane());
         JScrollPane scrollPane = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                                     JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        final JTextField width = new JTextField("width");
+        final JTextField height = new JTextField("height");
+        JButton resize = new JButton("Resize");
+        resize.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                updateSize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
+            }
+        });
         contentFrame.setMinimumSize(new Dimension(800, 600));
         contentFrame.setLocation(0, 0);
-        contentFrame.add(scrollPane);
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup()
+                        .addComponent(scrollPane)
+                .addGroup(layout.createSequentialGroup()).addComponent(width).addComponent(height)
+                .addGroup(layout.createParallelGroup()).addComponent(resize)
+        );
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                    .addComponent(scrollPane)
+                .addGroup(layout.createParallelGroup()).addComponent(width).addComponent(height)
+                .addGroup(layout.createSequentialGroup()).addComponent(resize)
+        );
+
+        contentFrame.getContentPane().setLayout(layout);
         contentFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         contentFrame.setVisible(true);
+    }
+
+    public void updateSize(int width, int height){
+        verticalLines = width;
+        horizontalLines = height;
+        repaint();
     }
 
     @Override
@@ -36,8 +72,9 @@ public class Screen extends JPanel {
         g2.setColor(new Color(177, 177, 177));
         // lineOffsets contains the value of the vertical gap between lines and the horizontal gap between lines
         // in that order
-        int[] lineOffsets = drawGridLines(g2, 800, 600, 1600, 900);
+        int[] lineOffsets = drawGridLines(g2, this.verticalLines, this.horizontalLines, 1600, 900);
         drawLine(g2,0,0,50,300,lineOffsets);
+        drawLine(g2,0,10,50,10,lineOffsets);
         drawLine(g2, 10, 50, 300, 80, lineOffsets);
         drawLine(g2, 30, 10, 505,300, lineOffsets);
     }
@@ -58,9 +95,9 @@ public class Screen extends JPanel {
         int incrE=2*dy, incrNE=2*(dy-dx);
         int x=x0, y=y0;
 
-        writePixel(g2, x, y, Color.black, lineOffsets);
+        writePixel(g2, x, y, Color.red, lineOffsets);
         do {
-            writePixel(g2, x, y, Color.black, lineOffsets);
+            writePixel(g2, x, y, Color.red, lineOffsets);
             if (d <= 0) {
                 x++;
                 d += incrE;
@@ -85,7 +122,7 @@ public class Screen extends JPanel {
         int horizontalOffset = lineOffsets[0];
         int verticalOffset = lineOffsets[1];
         g2.setColor(pixelColor);
-        g2.drawOval(x * verticalOffset, y * horizontalOffset, 1,1);
+        g2.drawOval(x * verticalOffset-2, y * horizontalOffset-2, 5,5);
     }
 
     /**
@@ -117,7 +154,6 @@ public class Screen extends JPanel {
             g2.drawLine(i * horizLineSpacing,0, i * horizLineSpacing, frameHeight);
         }
 
-        int[] gapValues = {vertLineSpacing, horizLineSpacing};
-        return gapValues;
+        return new int[]{vertLineSpacing, horizLineSpacing};
     }
 }
