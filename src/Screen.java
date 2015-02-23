@@ -13,7 +13,7 @@ import java.awt.event.ActionListener;
  *
  */
 public class Screen extends JPanel {
-    private int verticalLines = 80, horizontalLines = 60;
+    private int verticalLines = 300, horizontalLines = 300;
     private int pixelSize = 3;
     public static void main(String[] args){
         new Screen();
@@ -27,8 +27,8 @@ public class Screen extends JPanel {
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
 
-        final JTextField width = new JTextField("80");
-        final JTextField height = new JTextField("60");
+        final JTextField width = new JTextField("200");
+        final JTextField height = new JTextField("200");
         final JSlider radius = new JSlider(1, 25, 3);
         radius.addChangeListener(new ChangeListener() {
             @Override
@@ -121,19 +121,31 @@ public class Screen extends JPanel {
         // lineOffsets contains the value of the vertical gap between lines and the horizontal gap between lines
         // in that order
         int[] lineOffsets = drawGridLines(g2, this.verticalLines, this.horizontalLines, 1600, 900);
-//        drawLine(g2,0,0,50,300,lineOffsets);
-//        drawLine(g2,0,10,50,10,lineOffsets);
-//        drawLine(g2, 10, 0, 100, 0, lineOffsets);
-//        drawLine(g2, 10, 50, 300, 80, lineOffsets);
-//        drawLine(g2, 30, 10, 505,300, lineOffsets);
-        int[] x = {0, 0, 10, 10, 0};
-        int[] y = {0, 10, 10, 0, 0};
-//        drawPolygon(g2, x, y, Color.black, lineOffsets );
-        int[] x1 = {0, 0, 20, 10, 5, 0};
-        int[] y1 = {0, 20, 25, 5, 0, 0};
-        drawPolygon(g2, x1, y1, Color.black, lineOffsets );
-//        drawLine(g2, 10, 0, 0, 0, lineOffsets);
-//        drawLine(g2, 10,10, 10, 0, lineOffsets);
+//        int[] x = {50,20,40,20,50,70,60,100,80,100};
+//        int[] y = {20,40,60,90,250,220,190,180,120,80};
+
+        // Pacman
+        int[] x = {90,60,60,90,120, 90, 120};
+        int[] y = {90,130,150,180,150, 130, 120};
+
+        fillPolygon(g2, x, y, Color.yellow, lineOffsets);
+        drawPolygon(g2, x, y, Color.lightGray, lineOffsets);
+
+//        int[] x2 = {10, 10, 15, 100, 150, 120,100, 110};
+//        int[] y2 = {100, 150, 170, 180, 150, 120, 100, 50};
+
+        // Balloon
+        int[] x2 = {50, 75, 85, 75, 40, 60,25, 15, 25};
+        int[] y2 = {50, 60, 100, 125, 150, 150,125, 100, 60};
+
+        fillPolygon(g2, x2, y2, Color.blue, lineOffsets);
+        drawPolygon(g2, x2, y2, Color.lightGray, lineOffsets);
+
+//        int[] x1 = {220,200,175,150,110,90,80,100,80,100,150,180};
+//        int[] y1 = {50,80,120,190,250,230,210,180,120,80,40,50};
+//
+//        fillPolygon(g2, x1, y1, Color.green, lineOffsets);
+//        drawPolygon(g2, x1, y1, Color.black, lineOffsets);
     }
 
     /**
@@ -146,94 +158,102 @@ public class Screen extends JPanel {
      * @param y1 the y coordinate of the second point
      * @param lineOffsets an array containing the horizontal and vertical offsets of the gridlines
      */
-    private void drawLine(Graphics2D g2, int x0, int y0, int x1, int y1, int[] lineOffsets){
-        if(x0 > x1) {
-            // swap x0 and x1
-            int tmp = x0;
-            x0 = x1;
-            x1 = tmp;
-            // swap y0 and y1
-            tmp = y0;
-            y0 = y1;
-            y1 = tmp;
+    private void drawLine(Graphics2D g2, int x0, int y0, int x1, int y1, Color color,  int[] lineOffsets){
+        int w = x1 - x0 ;
+        int h = y1 - y0 ;
+        int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0 ;
+        if (w<0) dx1 = -1 ; else if (w>0) dx1 = 1 ;
+        if (h<0) dy1 = -1 ; else if (h>0) dy1 = 1 ;
+        if (w<0) dx2 = -1 ; else if (w>0) dx2 = 1 ;
+        int longest = Math.abs(w) ;
+        int shortest = Math.abs(h) ;
+        if (!(longest>shortest)) {
+            longest = Math.abs(h) ;
+            shortest = Math.abs(w) ;
+            if (h<0) dy2 = -1 ; else if (h>0) dy2 = 1 ;
+            dx2 = 0 ;
         }
-        if(y0 > y1){
-            // swap y0 and y1
-            int tmp = y0;
-            y0 = y1;
-            y1 = tmp;
-
-            // swap x0 and x1
-            tmp = x0;
-            x0 = x1;
-            x1 = tmp;
-        }
-        int dx = x1 - x0, dy=y1-y0;
-        int d=2*(dy-dx);
-        int incrE=2*dy, incrNE=2*(dy-dx);
-        int x=x0, y=y0;
-
-        writePixel(g2, x, y, Color.red, lineOffsets);
-        while (x < x1){
-            if (d <= 0) {
-                x++;
-                d += incrE;
+        int numerator = longest >> 1 ;
+        for (int i=0;i<=longest;i++) {
+            writePixel(g2, x0,y0, color, lineOffsets);
+            numerator += shortest ;
+            if (!(numerator<longest)) {
+                numerator -= longest ;
+                x0 += dx1 ;
+                y0 += dy1 ;
+            } else {
+                x0 += dx2 ;
+                y0 += dy2 ;
             }
-            else {
-                x++;
-                y++;
-                d += incrNE;
-            }
-            writePixel(g2, x, y, Color.red, lineOffsets);
         }
-        // Draw vertical lines
-        while (y <= y1) {
-            writePixel(g2, x, y, Color.red, lineOffsets);
-            y++;
-        }
-
-
     }
 
     private void drawPolygon(Graphics2D g2, int[] x, int[] y, Color color, int[] lineOffsets) {
         double[][] edges = new double[x.length][4];
         int y0, y1, x0, x1;
-        for (int pos = 0; pos < x.length - 1; pos++) {
+        for (int pos = 0; pos <= x.length - 1; pos++) {
+            if(pos == x.length - 1){
+                x1 = x[0];
+                y1 = y[0];
+            }else{
+                x1 = x[pos + 1];
+                y1 = y[pos + 1];
+            }
             y0 = y[pos];
-            y1 = y[pos + 1];
             x0 = x[pos];
-            x1 = x[pos + 1];
+
+            drawLine(g2, x0, y0, x1, y1,color, lineOffsets);
+        }
+    }
+
+    /**
+     * Method to get the global edges for a polygon.
+     * @param x
+     * @param y
+     * @return
+     */
+    private double[][] getEdges(int[] x, int[] y) {
+        double[][] edges = new double[x.length][4];
+        int y0, y1, x0, x1;
+        for (int pos = 0; pos <= x.length - 1; pos++) {
+            if (pos == x.length - 1) {
+                y1 = y[0];
+                x1 = x[0];
+            }else{
+                y1 = y[pos + 1];
+                x1 = x[pos + 1];
+            }
+            y0 = y[pos];
+            x0 = x[pos];
 
             // If y0 greater than y1 return y1 position else return y0 position
-            int minYPos = y0 > y1 ? pos + 1 : pos;
+            int minYPos;
+            if(pos == x.length - 1)
+                minYPos = y0 > y1 ? 0 : pos;
+            else
+                minYPos = y0 >= y1 ? pos + 1 : pos;
             int maxY = y0 > y1 ? y0 : y1;
             edges[pos][0] = y[minYPos];
             edges[pos][1] = maxY;
             edges[pos][2] = x[minYPos];
-            double dy = y1 > y0 ? (double)y1 - (double)y0 : (double)y0 - (double) y1;
-            double dx = x1 > x0 ? (double)x1 - (double)x0 : (double)x0 - (double)x1;
-            if( dx > 0)
+            double dy = (double) y1 - (double) y0;
+            double dx = (double) x1 - (double) x0;
+            if (Math.abs(dx) > 0)
                 edges[pos][3] = dx / dy;
             else
                 edges[pos][3] = 0;
-            drawLine(g2, x0, y0, x1, y1, lineOffsets);
         }
+
 
         int j;
         int lengthOfGlobalEdges = 0;
         int[] posForGlobal = new int[edges.length];
         int k = 0;
         for (int i = 0; i < edges.length; i++) {
-            System.out.println("i: " + i + " " + (1.0/edges[i][3]));
-            if(Math.abs(edges[i][3]) >= 0.0) {
-                if(!Double.isInfinite(edges[i][3])) {
-                    posForGlobal[k] = i;
-                    k++;
-                    lengthOfGlobalEdges++;
-                }else{
-                    posForGlobal[k] = -1;
-                    k++;
-                }
+            if(!Double.isInfinite(edges[i][3])) {
+                posForGlobal[k] = i;
+                k++;
+                lengthOfGlobalEdges++;
             }
             else{
                 posForGlobal[k] = -1;
@@ -255,43 +275,147 @@ public class Screen extends JPanel {
         }
 
         double key;
-        for (int i = 0; i < globalEdges.length; i ++){
-            key = globalEdges[i][0];
-            j = i - 1;
-            while (j >= 0 && globalEdges[j][0] > key){
-                double[] tmp = globalEdges[j];
-                globalEdges[j] = globalEdges[j+1];
-                globalEdges[j+1] = tmp;
-                j = j-1;
-            }
-            globalEdges[j+1][0] = key;
-        }
-        return;
+        globalEdges = sortEdges(globalEdges);
+        return globalEdges;
     }
 
-//    public int[][] getEdgesTable(int[] x, int[] y){
-//
-//
-//        int size = x.length;
-//        int[] xCoords = x;
-//        int[] yCoords = y;
-//        int scanLine = getMinY(y); //will be intialized to lowest y value
-//        int[][] edges = new int[4][size];
-//
-//        boolean parity = false;
-//
-//        for (int i = 0; i < size; i ++){
-//
-//            edges[i][0] = Math.min(yCoords[i], yCoords[i+1]);
-//            int tempXValIndex = checkMinIndex(yCoords[i], i, yCoords[i+1], i+1);
-//            edges[i][1] = Math.max(yCoords[i], yCoords[i+1]);
-//            edges[i][2] = xCoords[tempXValIndex];
-//            edges[i][3] = ((xCoords[i] - xCoords[i+1]) / (yCoords[i] - yCoords[i+1]));
-//
-//        }
-//
-//        return edges;
-//    }
+    /**
+     * Method to fill a polygon with color.
+     * @param g2 the graphics
+     * @param x array of x coordinates
+     * @param y array of y coordinates
+     * @param color color to fill shape with
+     * @param lineOffsets vertical and horizontal offset of the pixels
+     */
+    private void fillPolygon(Graphics2D g2, int[] x, int[] y, Color color, int[] lineOffsets) {
+        double[][] globalEdges = getEdges(x, y);
+        int scanLine = (int)globalEdges[0][0];
+        int activeEdgeSize = 0;
+        while (scanLine < y[maxPosition(y)]) {
+            double[][] activeEdges = getActiveEdgeList(globalEdges, scanLine);
+            int parity = 0;
+            int activePosition = 0;
+            int yPos = scanLine;
+            int xPos = 0;
+            while(xPos < activeEdges[getMaxXPos(activeEdges)][2]) {
+                if (parity % 2 != 0) {
+                    writePixel(g2, xPos, yPos, color, lineOffsets);
+                    g2.setColor(color.black);
+                    g2.drawString(parity + "", xPos * lineOffsets[1] + 2, yPos * lineOffsets[0] + 2);
+                }
+                if ((int)activeEdges[activePosition][2] == xPos)  {
+                    parity = (parity + 1) % 2;
+                    activePosition++;
+                    activeEdges = getActiveEdgeList(globalEdges, scanLine);
+                    g2.setColor(color.black);
+                    g2.setFont(new Font(Font.DIALOG, Font.PLAIN, 6));
+                    g2.drawString(parity + "", xPos * lineOffsets[1] + 2, yPos * lineOffsets[0] + 2);
+                }
+                xPos++;
+            }
+            scanLine++;
+            activeEdges = getActiveEdgeList(globalEdges, scanLine);
+            activeEdges = updateActiveEdges(activeEdges);
+            activePosition = 0;
+            parity = 0;
+        }
+
+    }
+
+    private double[][] getActiveEdgeList(double[][] globalEdges, int scanLine){
+        int activeEdgeSize = 0;
+        for (int i = 0; i < globalEdges.length; i++) {
+            if (globalEdges[i][0] == scanLine && globalEdges[i][1] >= scanLine) {
+                activeEdgeSize++;
+            }
+            if(globalEdges[i][0] < scanLine && globalEdges[i][1] > scanLine){
+                activeEdgeSize++;
+            }
+        }
+        double[][] activeEdges = new double[activeEdgeSize][4];
+        for (int i = 0; i < activeEdgeSize; i++) {
+            for(int j = i; j < globalEdges.length ; j++) {
+                if (globalEdges[j][0] == scanLine && globalEdges[j][1] >= scanLine) {
+                    activeEdges[i] = globalEdges[j];
+                    i++;
+                }
+                if (globalEdges[j][0] < scanLine && globalEdges[j][1] > scanLine) {
+                    activeEdges[i] = globalEdges[j];
+                    i++;
+                }
+            }
+        }
+        activeEdges = sortEdges(activeEdges);
+        return activeEdges;
+    }
+
+    private int getMaxXPos(double[][] arr) {
+        int maxPos = 0;
+        for (int i = 1; i < arr.length; i++) {
+            if(arr[maxPos][2] < arr[i][2]){
+                maxPos = i;
+            }
+        }
+        return maxPos;
+    }
+
+    private int getMaxYPos(double[][] arr) {
+        int maxPos = 0;
+        for (int i = 1; i < arr.length; i++) {
+            if(arr[maxPos][1] < arr[i][1]){
+                maxPos = i;
+            }
+        }
+        return maxPos;
+    }
+
+    private double[][] updateActiveEdges(double[][] arr) {
+        double[][] updatedArr = new double[arr.length][4];
+        for (int i = 0; i < arr.length; i++) {
+            updatedArr[i] = arr[i];
+            updatedArr[i][2] += updatedArr[i][3];
+        }
+        return sortEdges(updatedArr);
+    }
+
+    private double[][] sortEdges(double[][] arr) {
+        double key;
+        int j;
+        for (int i = 0; i < arr.length; i ++){
+            key = arr[i][1];
+            j = i - 1;
+            while (j >= 0 && arr[j][1] >= key) {
+                double[] tmp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = tmp;
+                j = j - 1;
+            }
+            arr[j+1][1] = key;
+        }
+        for (int i = 0; i < arr.length; i ++){
+            key = arr[i][2];
+            j = i - 1;
+            while (j >= 0 && arr[j][2] <= key) {
+                double[] tmp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = tmp;
+                j = j - 1;
+            }
+            arr[j+1][2] = key;
+        }
+        for (int i = 0; i < arr.length; i ++){
+            key = arr[i][0];
+            j = i - 1;
+            while (j >= 0 && arr[j][0] >= key){
+                double[] tmp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = tmp;
+                j = j-1;
+            }
+            arr[j+1][0] = key;
+        }
+        return arr;
+    }
 
     private int minPosition(int[] arr) {
         int minPos = 0;
