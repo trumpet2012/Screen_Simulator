@@ -121,31 +121,20 @@ public class Screen extends JPanel {
         // lineOffsets contains the value of the vertical gap between lines and the horizontal gap between lines
         // in that order
         int[] lineOffsets = drawGridLines(g2, this.verticalLines, this.horizontalLines, 1600, 900);
-//        int[] x = {50,20,40,20,50,70,60,100,80,100};
-//        int[] y = {20,40,60,90,250,220,190,180,120,80};
 
         // Pacman
         int[] x = {90,60,60,90,120, 90, 120};
         int[] y = {90,130,150,180,150, 130, 120};
 
         fillPolygon(g2, x, y, Color.yellow, lineOffsets);
-        drawPolygon(g2, x, y, Color.lightGray, lineOffsets);
-
-//        int[] x2 = {10, 10, 15, 100, 150, 120,100, 110};
-//        int[] y2 = {100, 150, 170, 180, 150, 120, 100, 50};
+        drawPolygon(g2, x, y, Color.darkGray, lineOffsets);
 
         // Balloon
         int[] x2 = {50, 75, 85, 75, 40, 60,25, 15, 25};
         int[] y2 = {50, 60, 100, 125, 150, 150,125, 100, 60};
 
         fillPolygon(g2, x2, y2, Color.blue, lineOffsets);
-        drawPolygon(g2, x2, y2, Color.lightGray, lineOffsets);
-
-//        int[] x1 = {220,200,175,150,110,90,80,100,80,100,150,180};
-//        int[] y1 = {50,80,120,190,250,230,210,180,120,80,40,50};
-//
-//        fillPolygon(g2, x1, y1, Color.green, lineOffsets);
-//        drawPolygon(g2, x1, y1, Color.black, lineOffsets);
+        drawPolygon(g2, x2, y2, Color.darkGray, lineOffsets);
     }
 
     /**
@@ -300,16 +289,16 @@ public class Screen extends JPanel {
             while(xPos < activeEdges[getMaxXPos(activeEdges)][2]) {
                 if (parity % 2 != 0) {
                     writePixel(g2, xPos, yPos, color, lineOffsets);
-                    g2.setColor(color.black);
-                    g2.drawString(parity + "", xPos * lineOffsets[1] + 2, yPos * lineOffsets[0] + 2);
+//                    g2.setColor(color.black);
+//                    g2.drawString(parity + "", xPos * lineOffsets[1] + 2, yPos * lineOffsets[0] + 2);
                 }
                 if ((int)activeEdges[activePosition][2] == xPos)  {
                     parity = (parity + 1) % 2;
                     activePosition++;
                     activeEdges = getActiveEdgeList(globalEdges, scanLine);
-                    g2.setColor(color.black);
-                    g2.setFont(new Font(Font.DIALOG, Font.PLAIN, 6));
-                    g2.drawString(parity + "", xPos * lineOffsets[1] + 2, yPos * lineOffsets[0] + 2);
+//                    g2.setColor(color.black);
+//                    g2.setFont(new Font(Font.DIALOG, Font.PLAIN, 6));
+//                    g2.drawString(parity + "", xPos * lineOffsets[1] + 2, yPos * lineOffsets[0] + 2);
                 }
                 xPos++;
             }
